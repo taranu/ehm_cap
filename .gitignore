@@ -1,0 +1,4 @@
+Debug/*.exe
+Debug/src/*.[od]
+Release/*.exe
+Release/src/*.[od]
