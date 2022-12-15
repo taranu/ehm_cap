@@ -30,10 +30,11 @@ const caphit MAXCAP = 60e6;
 const caphit MAXAHLSALARY = 8e5;
 const double WAIVERAGE = 23;
 const size_t MINNPRO = 22;
+const int YEAR_FIRST = 2022;
 
 const string EHMSEP = "  ";
 
-const string TEAMNAMES[NTEAMS] = {"ANA","CBS","BOS","BUF","CGY","CAR","CHI","COL","WPG","DAL","DET","EDM","FLA","LA","MIN","MTL","NYI","NYR","NAS","NJ","OTT","PHI","ARI","PIT","SJ","STL","TB","TOR","VAN","WSH"};
+const string TEAMNAMES[NTEAMS] = {"ANA","CBJ","BOS","BUF","CGY","CAR","CHI","COL","WPG","DAL","DET","EDM","FLA","LA","MIN","MTL","NYI","NYR","NAS","NJ","OTT","PHI","ARZ","PIT","SJ","STL","TB","TOR","VAN","WAS"};
 const string POSITIONS[5] = {"G","D","LW","C","RW"};
 const string HANDS[2] = {"R","L"};
 const size_t NPERFORMANCE = 4;
@@ -919,7 +920,7 @@ caphit getPlayerCapHit(const Player & player, int year, int month, int day)
 	bool nhl = isNHL(player);
 	bool ahl = isAHL(player);
 	return max(caphit(0), player.getSalary()*(nhl ||
-		(ahl && (player.getAge(2021, 9, 15) >= WAIVERAGE)))
+		(ahl && (player.getAge(YEAR_FIRST, 9, 15) >= WAIVERAGE)))
 		- MAXAHLSALARY*ahl);
 }
 
@@ -1306,6 +1307,22 @@ int main(int argc, char * argv[])
 	}
 	else
 	{
+		outputFile << "\"sh\",\"pl\",\"st\",\"ch\",\"po\",\"hi\",\"sk\",\"en\",\"pe\","
+					"\"fa\",\"le\",\"str\",\"pot\",\"con\",\"gre\",\"fi\",\"click\",\"team\","
+					"\"position\",\"country\",\"hand\",\"byear\",\"bday\",\"bmonth\",\"salary\","
+					"\"years\",\"draft_year\",\"draft_round\",\"draft_team\",\"rights\",\"thisweek_gp\","
+					"\"thisweek_g\",\"thisweek_a\",\"thisweek_gwg\",\"thismonth_gp\",\"thismonth_g\","
+					"\"thismonth_a\",\"thismonth_gwg\",\"records_g\",\"records_a\",\"records_p\","
+					"\"notrade\",\"twoway\",\"option\",\"status\",\"rookie\",\"offer_status\","
+					"\"offer_team\",\"offer_time\",\"injury_status\",\"scout_1_10\","
+					"\"scout_11_20\",\"scout_21_30\",\"streak_g\",\"streak_p\",\"gp\",\"suspension\","
+					"\"training\",\"weight\",\"height\",\"status_org\",\"streak_best_gp\","
+					"\"streak_best_gwg\",\"streak_best_p\",\"streak_best_a\",\"streak_best_g\","
+					"\"unused\",\"name_first\",\"name_last\",\"performance\",\"acquired\",\"ceil_fi\","
+					"\"ceil_sh\",\"ceil_pl\",\"ceil_st\",\"ceil_ch\",\"ceil_po\",\"ceil_hi\","
+					"\"ceil_sk\",\"ceil_en\",\"ceil_pe\",\"ceil_fa\",\"ceil_le\",\"ceil_str\","
+					"\"version\",\"attitude\",\"position_alt\",\"rights_2\","
+					"\"injury_prone\",\"draft_overall\",\"id\"" << std::endl;
 		for(uint i = 0; i < nplayers; i++)
 		{
 			players.push_back(Player(inputFile, !isCSV, tempdata, tempdataSize, i));
@@ -1330,14 +1347,14 @@ int main(int argc, char * argv[])
 			{
 				playerCaps[i] = new Player(capFile, true, tempdata, tempdataSize,i);
 
-				const Player & p = players[i];
+				const Player & p = *(playerCaps[i]);
 				int team = p.getRights();
 				bool ahl = team > NTEAMS && team <= 2*NTEAMS;
 
 				// Add AHL players too
 				if((((team > 0) && (team <= NTEAMS)) || ahl) && p.getContractLength() > 0)
 				{
-					capPlayers[team-1-ahl*NTEAMS].push_back(&players[i]);
+					capPlayers[team-1-ahl*NTEAMS].push_back(playerCaps[i]);
 					/*
 					if(players[i]->getContractLength() == 0)
 					{
@@ -1352,7 +1369,6 @@ int main(int argc, char * argv[])
 			}
 
 			capFile.close();
-
 			vector<Player*>::const_iterator it;
 
 			ofstream capOutfile;
