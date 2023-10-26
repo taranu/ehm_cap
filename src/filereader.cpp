@@ -30,7 +30,7 @@ const caphit MAXCAP = 60e6;
 const caphit MAXAHLSALARY = 8e5;
 const double WAIVERAGE = 23;
 const size_t MINNPRO = 22;
-const int YEAR_FIRST = 2022;
+const int YEAR_FIRST = 2023;
 
 const string EHMSEP = "  ";
 
